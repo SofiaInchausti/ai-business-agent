@@ -261,12 +261,12 @@ These can be executed automatically:
 * `search_customers`
 * `get_customer`
 * `search_knowledge_base`
+* `create_email_draft`
+
 
 ### Side-effect tools
 
 These require approval:
-
-* `create_email_draft`
 * `send_email`
 
 The approval requirement must be enforced by the backend and must not depend only on the AI model.
@@ -384,8 +384,28 @@ messages
 approvals
 audit_logs
 ```
+### Core identity and organization entities
 
-All organization-owned records must contain an `organization_id` or be reachable through an organization-owned relation.
+User represents an authenticated application user.
+
+Organization represents a tenant/company using the platform.
+
+OrganizationMember represents the membership of a user in an organization and stores the user's role within that organization.
+
+Relationships:
+
+User 1 ──── N OrganizationMember N ──── 1 Organization
+
+A user may belong to multiple organizations.
+
+A user has exactly one role per organization membership.
+
+Initial roles:
+
+ADMIN
+MEMBER
+
+All organization-owned records must contain an `organization_id` or be reachable through a validated organization-owned relation.
 
 ---
 
@@ -413,6 +433,18 @@ Organization
 A user belonging to Organization A must never be able to access Organization B data.
 
 Tenant isolation must be enforced by NestJS/backend queries and authorization rules.
+
+Organization is the tenant boundary for business data.
+
+Organization-owned entities must reference their organization directly through organization_id or indirectly through a validated organization-owned relation.
+
+Every authenticated request must establish:
+
+- user_id
+- organization_id
+- role
+
+The backend must validate that the authenticated user is a member of the requested organization before accessing organization-owned data.
 
 ---
 

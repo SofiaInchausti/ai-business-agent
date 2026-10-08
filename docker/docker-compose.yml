@@ -8,7 +8,7 @@ services:
       POSTGRES_PASSWORD: app
       POSTGRES_DB: ai_business_agent
     ports:
-      - "5433:5433"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
